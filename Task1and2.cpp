@@ -139,6 +139,14 @@ void mutareVapoare(struct Vapor** f, int* dimensiuneF, int capacitateMinima, str
 	*dimensiuneF = newDimensiuneF;
 }
 
+void eliberareMemorie(Vapor* v, int dimensiune) {
+    for (int i = 0; i < dimensiune; i++) {
+        free(v[i].denumire);
+        free(v[i].cantitati);
+    }
+    free(v);
+}
+
 
 int main() {
 	int nrVapoare = 5;
@@ -182,5 +190,7 @@ int main() {
 
 
 	/*printf("Cod: %d, denumire: %s, nr_magazii: %d, ", v1.cod, v1.denumire, v1.nrMagazii);*/
-
+	eliberareMemorie(flota, nrVapoare);
+    eliberareMemorie(f2, nrVapF2);
+    eliberareMemorie(f3, nrVapF3);
 }
