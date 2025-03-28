@@ -1,4 +1,4 @@
-﻿#include<stdio.h>
+#include<stdio.h>
 #include<string.h>
 #include<malloc.h>
 #include <stdlib.h>
@@ -38,18 +38,19 @@ struct Vapor citire() {
 	return v;
 }
 
-float totalIncarcatura(const Vapor& v) {
+float totalIncarcatura(const struct Vapor* v) {
 	float sum = 0;
-	for (int i = 0; i < v.nrMagazii; i++)
-		sum += v.cantitati[i];
+	for (int i = 0; i < v->nrMagazii; i++)
+		sum += v->cantitati[i];
 	return sum;
 }
 
-void modificaDenumire(Vapor& v, const char* denumireNoua) {
-	free(v.denumire);
-	v.denumire = (char*)malloc((strlen(denumireNoua) + 1) * sizeof(char));
-	strcpy_s(v.denumire, strlen(denumireNoua) + 1, denumireNoua);
+void modificaDenumire(struct Vapor* v, const char* denumireNoua) {
+	free(v->denumire);
+	v->denumire = (char*)malloc((strlen(denumireNoua) + 1) * sizeof(char));
+	strcpy_s(v->denumire, strlen(denumireNoua) + 1, denumireNoua);
 }
+
 
 struct Vapor initializare(int cod, const char* denumire, int nrMagazii, const float* cantitati) {
 	struct Vapor v;
@@ -96,7 +97,7 @@ void copiereInVectorNou( struct Vapor* f, int dimensiuneF, int nrMagaziiSelectat
 void mutareVapoare(struct Vapor** f, int* dimensiuneF, int capacitateMinima, struct Vapor** vectorNou, int* dimensiuneVectorNou) {
 	*dimensiuneVectorNou = 0;
 	for (int i = 0; i < *dimensiuneF; i++) {
-		if (totalIncarcatura((*f)[i]) > capacitateMinima) {
+		if (totalIncarcatura(&(*f)[i]) > capacitateMinima) {
 			(*dimensiuneVectorNou)++;
 		}
 	}
@@ -109,7 +110,7 @@ void mutareVapoare(struct Vapor** f, int* dimensiuneF, int capacitateMinima, str
 
 	int j = 0;
 	for (int i = 0; i < *dimensiuneF; i++) {
-		if (totalIncarcatura((*f)[i]) > capacitateMinima) {
+		if (totalIncarcatura(&(*f)[i]) > capacitateMinima) {
 			(*vectorNou)[k].cod = (*f)[i].cod;
 			(*vectorNou)[k].denumire = (char*)malloc((strlen((*f)[i].denumire) + 1) * sizeof(char));
 			strcpy_s((*vectorNou)[k].denumire, strlen((*f)[i].denumire) + 1, (*f)[i].denumire);
@@ -234,16 +235,16 @@ struct Vapor* citireVapoareDinFisier(FILE* file, int* dim) {
 }
 
 
-void scriereVaporInFisier(FILE* f, const struct Vapor& v) {
-	fprintf(f, "\n%d,%s,%i", v.cod, v.denumire, v.nrMagazii);
-	for (int i = 0; i < v.nrMagazii; i++) {
-		fprintf(f, ",%.2f", v.cantitati[i]);
+void scriereVaporInFisier(FILE* f, const struct Vapor* v) {
+	fprintf(f, "\n%d,%s,%i", v->cod, v->denumire, v->nrMagazii);
+	for (int i = 0; i < v->nrMagazii; i++) {
+		fprintf(f, ",%.2f", v->cantitati[i]);
 	}
 }
 
 void scriereVapoareInFisier(FILE* f, const struct Vapor* vapoare, int dim) {
 	for (int i = 0; i < dim; i++) {
-		scriereVaporInFisier(f, vapoare[i]);
+		scriereVaporInFisier(f, &vapoare[i]);
 	}
 }
 
@@ -261,11 +262,11 @@ int main() {
 	struct Vapor* flota;
 	flota = (struct Vapor*)malloc(nrVapoare * sizeof(Vapor));
 
-	flota[0] = initializare(1, "V1", 3, new float[3] {1, 2, 3});
-	flota[1] = initializare(2, "V2", 4, new float[4] {1, 2, 3, 45});
-	flota[2] = initializare(3, "V3", 3, new float[5] {1, 11.22f, 13.31f});
-	flota[3] = initializare(4, "V4", 5, new float[5] {1, 2, 3, 88, 22});
-	flota[4] = initializare(5, "V5", 5, new float[5] {1, 2, 32, 1, 1});
+    flota[0] = initializare(1, "V1", 3, (float[]){1, 2, 3});
+    flota[1] = initializare(2, "V2", 4, (float[]){1, 2, 3, 45});
+    flota[2] = initializare(3, "V3", 3, (float[]){1, 11.22f, 13.31f});
+    flota[3] = initializare(4, "V4", 5, (float[]){1, 2, 3, 88, 22});
+    flota[4] = initializare(5, "V5", 5, (float[]){1, 2, 32, 1, 1});
 
 	//afisareVector(flota,nrVapoare);
 
@@ -329,10 +330,10 @@ int main() {
 
     int nrLinii = 3;
     int nrColoane = 4;
-    Vapor** matrix = new Vapor*[nrLinii];
-	int v = 0;
+    Vapor** matrix = (Vapor**)malloc(nrLinii * sizeof(Vapor*));
+    int v = 0;
     for (int i = 0; i < nrLinii; ++i) {
-		matrix[i] = new Vapor[nrColoane];
+    matrix[i] = (Vapor*)malloc(nrColoane * sizeof(Vapor));
     }
 
 	for (int i = 0; i < nrLinii; i++) {
